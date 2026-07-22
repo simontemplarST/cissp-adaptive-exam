@@ -3,3 +3,5 @@ node_modules/
 *.log
 tools/.progress.json
 .env
+tools/.env
+*.env

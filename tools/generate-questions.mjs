@@ -175,17 +175,35 @@ async function pool(items, worker, size) {
   return results;
 }
 
-/* ---------------- plan the batches ---------------- */
+/* ---------------- plan the batches ----------------
+   Interleaved round-robin across domains (NOT sequential blocks) so that
+   if the run stops early — target hit, rate-limited, killed — every domain
+   still has proportional coverage instead of the last domains in the list
+   getting zero. DOMAIN_FILTER restricts to specific domains (comma list),
+   used for targeted backfills without redoing the whole bank. */
 function planBatches() {
+  const domainKeys = (process.env.DOMAIN_FILTER
+    ? process.env.DOMAIN_FILTER.split(",").map(s => s.trim()).filter(Boolean)
+    : Object.keys(DOMAINS));
+  const totalWeight = domainKeys.reduce((s, d) => s + WEIGHT[d], 0);
+
+  const perDomain = {};
+  for (const dom of domainKeys) {
+    perDomain[dom] = { want: Math.ceil(TARGET * (WEIGHT[dom] / totalWeight) * 1.4), made: 0, di: 0 };
+  }
+
   const jobs = [];
-  for (const dom of Object.keys(DOMAINS)) {
-    const want = Math.ceil(TARGET * WEIGHT[dom] * 1.4); // 1.4x to survive verify losses
-    let made = 0, di = 0;
-    while (made < want) {
-      const diff = DIFFS[di % 3]; di++;
-      const n = Math.min(BATCH, want - made);
+  let anyLeft = true;
+  while (anyLeft) {
+    anyLeft = false;
+    for (const dom of domainKeys) {
+      const st = perDomain[dom];
+      if (st.made >= st.want) continue;
+      anyLeft = true;
+      const diff = DIFFS[st.di % 3]; st.di++;
+      const n = Math.min(BATCH, st.want - st.made);
       jobs.push({ dom, diff, n });
-      made += n;
+      st.made += n;
     }
   }
   return jobs;

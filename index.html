@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISSP Adaptive Practice Exam</title>
+<meta name="description" content="Adaptive (CAT) CISSP practice exam with 10,000 generated questions, immediate feedback, and an 8-domain competency report.">
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2530; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#3b82f6; --accent2:#2563eb;
+    --green:#238636; --green-l:#2ea043; --red:#da3633; --red-l:#f85149;
+    --amber:#d29922; --purple:#8957e5; --radius:12px;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:840px;margin:0 auto;padding:24px 20px 80px}
+  h1{font-size:1.6rem;margin:0 0 4px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:.92rem;margin:0 0 24px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:18px}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px 20px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s}
+  .btn:hover{background:var(--accent2)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.secondary{background:var(--panel2);border:1px solid var(--border);color:var(--text)}
+  .btn.secondary:hover{background:#252d38}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .field{margin:14px 0}
+  label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  select{background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-family:inherit;font-size:.95rem;width:100%}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;font-size:.85rem;color:var(--muted)}
+  .pbar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-bottom:22px}
+  .pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));transition:width .3s}
+  .badge{display:inline-block;font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--panel2);border:1px solid var(--border);color:var(--muted)}
+  .badge.d1{color:#3fb950;border-color:#238636}
+  .badge.d2{color:#d29922;border-color:#9e6a03}
+  .badge.d3{color:#f85149;border-color:#da3633}
+  .qtext{font-size:1.12rem;font-weight:500;margin:12px 0 20px;line-height:1.5}
+  .opt{display:flex;gap:12px;align-items:flex-start;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.12s;font-size:.98rem}
+  .opt:hover{border-color:var(--accent)}
+  .opt .key{flex:0 0 26px;height:26px;border-radius:6px;background:var(--panel);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--muted)}
+  .opt.correct{border-color:var(--green-l);background:rgba(46,160,67,.12)}
+  .opt.correct .key{background:var(--green);border-color:var(--green-l);color:#fff}
+  .opt.wrong{border-color:var(--red-l);background:rgba(248,81,73,.12)}
+  .opt.wrong .key{background:var(--red);border-color:var(--red-l);color:#fff}
+  .opt.disabled{cursor:default;pointer-events:none;opacity:.85}
+  .opt.dim{opacity:.5}
+  .feedback{margin-top:16px;padding:16px 18px;border-radius:10px;border:1px solid var(--border);background:var(--panel2);animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .feedback.right{border-left:4px solid var(--green-l)}
+  .feedback.bad{border-left:4px solid var(--red-l)}
+  .feedback h4{margin:0 0 6px;font-size:.95rem}
+  .feedback p{margin:0 0 10px;font-size:.92rem;color:#c9d1d9}
+  .feedback a{color:var(--accent);text-decoration:none;font-size:.88rem;font-weight:600}
+  .feedback a:hover{text-decoration:underline}
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:6px 0 24px}
+  .kpi{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+  .kpi .n{font-size:1.7rem;font-weight:700;letter-spacing:-.02em}
+  .kpi .l{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+  .verdict{font-size:1.15rem;font-weight:700;padding:14px 18px;border-radius:10px;margin-bottom:22px;text-align:center}
+  .verdict.pass{background:rgba(46,160,67,.14);border:1px solid var(--green-l);color:#3fb950}
+  .verdict.near{background:rgba(210,153,34,.14);border:1px solid var(--amber);color:#e3b341}
+  .verdict.fail{background:rgba(248,81,73,.14);border:1px solid var(--red-l);color:#f85149}
+  .dom{margin-bottom:14px}
+  .dom-head{display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:5px}
+  .dom-head .name{font-weight:500}
+  .dom-head .score{color:var(--muted);font-variant-numeric:tabular-nums}
+  .track{height:9px;background:var(--panel2);border-radius:5px;overflow:hidden}
+  .fill{height:100%;border-radius:5px;transition:width .6s}
+  .muted{color:var(--muted)}
+  .small{font-size:.82rem}
+  .disc{font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:26px;padding-top:16px}
+  ul.compact{margin:8px 0;padding-left:20px}
+  ul.compact li{margin-bottom:5px;font-size:.9rem}
+  .hide{display:none}
+  a.plain{color:var(--accent);text-decoration:none}
+  a.plain:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- START -->
+  <div id="start">
+    <h1>CISSP Adaptive Practice Exam</h1>
+    <p class="sub">Computerized Adaptive Testing (CAT) · immediate feedback · 8-domain competency report</p>
+
+    <div class="card">
+      <div class="field">
+        <label>Exam length</label>
+        <select id="cfgLen">
+          <option value="25">Quick — 25 items</option>
+          <option value="50" selected>Standard — 50 items</option>
+          <option value="100">Full CAT sim — 100 items</option>
+          <option value="150">Max CAT sim — 150 items</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Difficulty ceiling</label>
+        <select id="cfgCeil">
+          <option value="all" selected>Adaptive — let CAT find your level</option>
+          <option value="easy">Warm-up — easy items only</option>
+          <option value="hard">Brutal — hard items only</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Adaptive early-stop</label>
+        <select id="cfgStop">
+          <option value="1" selected>On — stop when ability is confidently estimated</option>
+          <option value="0">Off — always run full length</option>
+        </select>
+      </div>
+      <div class="row" style="margin-top:20px">
+        <button class="btn" id="startBtn" onclick="Exam.start()">Start exam</button>
+        <span class="small muted" id="bankInfo">Loading question bank…</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4 style="margin:0 0 8px">How the CAT engine works</h4>
+      <ul class="compact muted">
+        <li>Every item is tagged with a difficulty and one of the 8 (ISC)² domains.</li>
+        <li>Your ability estimate (θ) updates after each answer using a logistic (Rasch/IRT) model.</li>
+        <li>The next item is drawn near your current ability and weighted toward the real exam's domain mix — miss one, it eases off; nail it, it pushes harder.</li>
+        <li>When the estimate's standard error is small enough, the exam can stop early — like the real CISSP CAT (100–150 items).</li>
+      </ul>
+    </div>
+
+    <p class="disc">⚠️ These are <strong>original, generated practice questions</strong> built from verified fact tables across the (ISC)² CBK domains — <strong>not</strong> real, leaked, or copyrighted exam items (the actual pool is confidential, and using leaked pools can void a certification). Concepts are drawn from public references (NIST, OWASP, ISC², Wikipedia). Use this to drill understanding, not to memorize answers.</p>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam" class="hide">
+    <div class="topbar"><span id="qcount">Question 1</span><span id="thetaReadout"></span></div>
+    <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <span class="badge" id="qDomain">Domain</span>
+        <span class="badge" id="qDiff">Difficulty</span>
+      </div>
+      <div class="qtext" id="qText"></div>
+      <div id="qOpts"></div>
+      <div id="qFeedback"></div>
+      <div class="foot">
+        <span class="small muted" id="runScore"></span>
+        <button class="btn hide" id="nextBtn" onclick="Exam.next()">Next →</button>
+      </div>
+    </div>
+    <div class="row"><button class="btn secondary small" onclick="Exam.endEarly()">End &amp; see report</button></div>
+  </div>
+
+  <!-- REPORT -->
+  <div id="report" class="hide">
+    <h1>Exam Report</h1>
+    <p class="sub" id="repSub"></p>
+    <div id="verdict"></div>
+    <div class="kpis">
+      <div class="kpi"><div class="n" id="kScore">–</div><div class="l">Raw score</div></div>
+      <div class="kpi"><div class="n" id="kTheta">–</div><div class="l">Ability (θ)</div></div>
+      <div class="kpi"><div class="n" id="kItems">–</div><div class="l">Items taken</div></div>
+    </div>
+    <div class="card"><h4 style="margin:0 0 16px">Domain competency</h4><div id="domBars"></div></div>
+    <div class="card" id="weakCard"><h4 style="margin:0 0 8px">Where to focus next</h4><div id="weakList"></div></div>
+    <div class="row">
+      <button class="btn" onclick="Exam.restart()">Retake exam</button>
+      <button class="btn secondary" onclick="Exam.review()">Review answers</button>
+    </div>
+    <div id="reviewBlock" class="hide" style="margin-top:22px"></div>
+  </div>
+
+</div>
+
+<script src="assets/curated.js"></script>
+<script src="assets/bank.js"></script>
+<script>
+/* ================= build the pool ================= */
+const DOMAINS = CISSP_BANK.DOMAINS;
+const WEIGHT = {D1:.16,D2:.10,D3:.13,D4:.13,D5:.13,D6:.12,D7:.13,D8:.11}; // ~2024 CBK
+const B = {easy:-1.0, medium:0.0, hard:1.3};
+const SEED = 20260721;
+let BANK = [];
+try {
+  const generated = CISSP_BANK.build(10000, SEED);
+  BANK = (window.CISSP_CURATED||[]).concat(generated);
+} catch(e){ BANK = (window.CISSP_CURATED||[]); console.error(e); }
+
+document.getElementById("bankInfo").textContent =
+  BANK.length.toLocaleString()+" questions loaded · 8 domains";
+
+/* ================= adaptive engine ================= */
+const Exam = (function(){
+  let theta, seVar, asked, order, current, maxLen, adaptiveStop, ceil, log, pool;
+
+  function P(th,b){ return 1/(1+Math.exp(-(th-b))); }
+
+  function reset(){
+    theta=0; seVar=1.0; asked=new Set(); order=0; log=[];
+    // pre-filter by difficulty ceiling; index the pool once
+    pool = BANK.map((q,i)=>({q,i}))
+               .filter(x=> ceil==="all" ? true : x.q.d===ceil);
+  }
+
+  // desired domain mix vs. what we've sampled → coverage debt
+  function domainDebt(){
+    const cov={}; Object.keys(DOMAINS).forEach(k=>cov[k]=0);
+    log.forEach(l=>cov[l.dom]++);
+    const n=Math.max(1,log.length);
+    const debt={};
+    Object.keys(DOMAINS).forEach(k=> debt[k]=WEIGHT[k]-(cov[k]/n));
+    return debt;
+  }
+
+  // pick unused item near theta, nudged toward under-sampled domains
+  function selectNext(){
+    const debt=domainDebt();
+    let best=null,bestScore=Infinity;
+    // scan a bounded random window for speed on a 10k pool
+    const N=pool.length;
+    const tries=Math.min(N, 1400);
+    for(let t=0;t<tries;t++){
+      const x=pool[(Math.random()*N)|0];
+      if(asked.has(x.i)) continue;
+      const b=B[x.q.d];
+      const near=Math.abs(theta-b);              // information: closeness to ability
+      const dnudge=-(debt[x.q.dom]||0)*2.2;       // prefer under-represented domains
+      const jitter=Math.random()*0.15;
+      const score=near+dnudge+jitter;
+      if(score<bestScore){bestScore=score;best=x;}
+    }
+    if(best) return best;
+    // fallback: first unused
+    return pool.find(x=>!asked.has(x.i))||null;
+  }
+
+  function updateAbility(item,correct){
+    const b=B[item.q.d], p=P(theta,b), info=p*(1-p)||0.01;
+    theta+=(correct-p)/(info+1);
+    theta=Math.max(-3.5,Math.min(3.5,theta));
+    seVar=1/((1/seVar)+info);
+  }
+
+  function shouldStop(){
+    if(order>=maxLen) return true;
+    if(asked.size>=pool.length) return true;
+    if(adaptiveStop && order>=Math.max(12,Math.floor(maxLen*0.4)) && Math.sqrt(seVar)<0.42) return true;
+    return false;
+  }
+
+  function show(id){ ["start","exam","report"].forEach(s=>document.getElementById(s).classList.toggle("hide",s!==id)); }
+
+  function start(){
+    maxLen=parseInt(document.getElementById("cfgLen").value,10);
+    ceil=document.getElementById("cfgCeil").value;
+    adaptiveStop=document.getElementById("cfgStop").value==="1";
+    reset();
+    if(!pool.length){ alert("No questions match that filter."); return; }
+    show("exam"); renderNext();
+  }
+
+  function renderNext(){
+    if(shouldStop()) return finish();
+    const pick=selectNext();
+    if(!pick) return finish();
+    current=pick; asked.add(pick.i); order++;
+    const q=pick.q;
+
+    document.getElementById("qcount").textContent="Question "+order+" of up to "+maxLen;
+    document.getElementById("thetaReadout").textContent="θ "+theta.toFixed(2)+"  ·  SE "+Math.sqrt(seVar).toFixed(2);
+    document.getElementById("pfill").style.width=Math.min(100,order/maxLen*100)+"%";
+    document.getElementById("qDomain").textContent=DOMAINS[q.dom];
+    const diffEl=document.getElementById("qDiff");
+    diffEl.textContent=q.d.charAt(0).toUpperCase()+q.d.slice(1);
+    diffEl.className="badge "+(q.d==="easy"?"d1":q.d==="medium"?"d2":"d3");
+    document.getElementById("qText").textContent=q.q;
+    document.getElementById("qFeedback").innerHTML="";
+    document.getElementById("nextBtn").classList.add("hide");
+    const scored=log.filter(l=>l.correct).length;
+    document.getElementById("runScore").textContent=order>1?(scored+"/"+(order-1)+" correct so far"):"";
+
+    const optsEl=document.getElementById("qOpts"); optsEl.innerHTML="";
+    q.o.forEach((text,idx)=>{
+      const div=document.createElement("div"); div.className="opt";
+      div.innerHTML='<div class="key">'+String.fromCharCode(65+idx)+'</div><div>'+escapeHtml(text)+'</div>';
+      div.onclick=()=>answer(idx);
+      optsEl.appendChild(div);
+    });
+  }
+
+  function answer(idx){
+    const q=current.q, correct=idx===q.c;
+    document.querySelectorAll("#qOpts .opt").forEach((n,i)=>{
+      n.classList.add("disabled");
+      if(i===q.c) n.classList.add("correct");
+      else if(i===idx) n.classList.add("wrong");
+      else n.classList.add("dim");
+    });
+    updateAbility(current,correct?1:0);
+    log.push({dom:q.dom,d:q.d,correct,qi:current.i,chosen:idx});
+    document.getElementById("qFeedback").innerHTML=
+      '<div class="feedback '+(correct?"right":"bad")+'">'+
+        '<h4>'+(correct?"✓ Correct":"✗ Incorrect — correct answer: "+String.fromCharCode(65+q.c)+") "+escapeHtml(q.o[q.c]))+'</h4>'+
+        '<p>'+escapeHtml(q.why)+'</p>'+
+        '<a href="'+q.link+'" target="_blank" rel="noopener">Deeper dive ↗</a>'+
+      '</div>';
+    document.getElementById("nextBtn").classList.remove("hide");
+    document.getElementById("thetaReadout").textContent="θ "+theta.toFixed(2)+"  ·  SE "+Math.sqrt(seVar).toFixed(2);
+  }
+
+  function next(){ renderNext(); }
+  function endEarly(){ if(log.length) finish(); else show("start"); }
+
+  function finish(){
+    show("report");
+    const total=log.length, right=log.filter(l=>l.correct).length, pct=total?Math.round(right/total*100):0;
+    document.getElementById("repSub").textContent="Session complete · final ability θ = "+theta.toFixed(2)+" (SE "+Math.sqrt(seVar).toFixed(2)+")";
+    document.getElementById("kScore").textContent=right+"/"+total+" ("+pct+"%)";
+    document.getElementById("kTheta").textContent=theta.toFixed(2);
+    document.getElementById("kItems").textContent=total;
+
+    const v=document.getElementById("verdict");
+    let cls,msg;
+    if(theta>=0.55){cls="pass";msg="LIKELY PASS — ability is above the competency standard across sampled domains.";}
+    else if(theta>=-0.2){cls="near";msg="BORDERLINE — near the passing standard. Tighten the weak domains below.";}
+    else{cls="fail";msg="NOT YET — ability is below the competency standard. Focused study needed.";}
+    v.className="verdict "+cls; v.textContent=msg;
+
+    const dom={}; Object.keys(DOMAINS).forEach(k=>dom[k]={num:0,den:0,n:0});
+    log.forEach(l=>{
+      const w=l.d==="hard"?1.5:l.d==="medium"?1.0:0.7;
+      dom[l.dom].den+=w; dom[l.dom].num+=l.correct?w:0; dom[l.dom].n++;
+    });
+    const bars=document.getElementById("domBars"); bars.innerHTML="";
+    const weak=[];
+    Object.keys(DOMAINS).forEach(k=>{
+      const d=dom[k], score=d.n?Math.round(d.num/d.den*100):null;
+      if(d.n&&score<70) weak.push({k,score});
+      const color=score===null?"#484f58":score>=80?"#2ea043":score>=60?"#d29922":"#f85149";
+      const label=score===null?"not tested":score+"%  ("+d.n+" q)";
+      bars.innerHTML+='<div class="dom"><div class="dom-head"><span class="name">'+DOMAINS[k]+'</span><span class="score">'+label+'</span></div><div class="track"><div class="fill" style="width:'+(score===null?0:score)+'%;background:'+color+'"></div></div></div>';
+    });
+    const wl=document.getElementById("weakList");
+    if(weak.length){
+      weak.sort((a,b)=>a.score-b.score);
+      wl.innerHTML='<ul class="compact">'+weak.map(w=>'<li><strong>'+DOMAINS[w.k]+'</strong> — '+w.score+'%. Prioritize this domain.</li>').join("")+'</ul>';
+    } else {
+      wl.innerHTML='<p class="muted small">No sampled domain fell below 70%. Run a longer exam to confirm breadth.</p>';
+    }
+    document.getElementById("reviewBlock").classList.add("hide");
+    document.getElementById("reviewBlock").innerHTML="";
+  }
+
+  function review(){
+    const rb=document.getElementById("reviewBlock");
+    if(!rb.classList.contains("hide")){ rb.classList.add("hide"); return; }
+    rb.classList.remove("hide");
+    rb.innerHTML='<div class="card"><h4 style="margin:0 0 12px">Answer review</h4>'+
+      log.map((l,n)=>{const q=BANK[l.qi];return '<div style="border-top:1px solid var(--border);padding:12px 0">'+
+        '<div class="small muted">'+(n+1)+' · '+DOMAINS[l.dom]+' · '+l.d+'</div>'+
+        '<div style="font-weight:500;margin:4px 0">'+escapeHtml(q.q)+'</div>'+
+        '<div class="small">'+(l.correct?'<span style="color:#3fb950">✓ Correct</span>':'<span style="color:#f85149">✗ You chose '+String.fromCharCode(65+l.chosen)+') '+escapeHtml(q.o[l.chosen])+'</span> — correct: '+String.fromCharCode(65+q.c)+') '+escapeHtml(q.o[q.c]))+'</div>'+
+        '<div class="small muted" style="margin-top:4px">'+escapeHtml(q.why)+' <a class="plain" href="'+q.link+'" target="_blank" rel="noopener">↗</a></div></div>';}).join("")+'</div>';
+  }
+
+  function restart(){ show("start"); }
+  function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+  return {start,next,endEarly,review,restart};
+})();
+</script>
+</body>
+</html>

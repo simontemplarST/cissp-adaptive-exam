@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CISSP Adaptive Practice Exam</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --panel2:#1c2530; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#3b82f6; --accent2:#2563eb;
+    --green:#238636; --green-l:#2ea043; --red:#da3633; --red-l:#f85149;
+    --amber:#d29922; --purple:#8957e5;
+    --radius:12px; --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.55;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:840px;margin:0 auto;padding:24px 20px 80px;}
+  h1{font-size:1.6rem;margin:0 0 4px;letter-spacing:-.02em;}
+  .sub{color:var(--muted);font-size:.92rem;margin:0 0 24px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:24px;margin-bottom:18px;}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px 20px;
+    font-size:.95rem;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;}
+  .btn:hover{background:var(--accent2)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn.secondary{background:var(--panel2);border:1px solid var(--border);color:var(--text)}
+  .btn.secondary:hover{background:#252d38}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+  .field{margin:14px 0}
+  label{display:block;font-size:.85rem;color:var(--muted);margin-bottom:6px}
+  select,input[type=number]{background:var(--panel2);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:9px 12px;font-family:inherit;font-size:.95rem;width:100%}
+  /* progress */
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;
+    font-size:.85rem;color:var(--muted)}
+  .pbar{height:6px;background:var(--panel2);border-radius:4px;overflow:hidden;margin-bottom:22px}
+  .pfill{height:100%;background:linear-gradient(90deg,var(--accent),var(--purple));transition:width .3s}
+  .badge{display:inline-block;font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:20px;
+    background:var(--panel2);border:1px solid var(--border);color:var(--muted)}
+  .badge.d1{color:#3fb950;border-color:#238636}
+  .badge.d2{color:#d29922;border-color:#9e6a03}
+  .badge.d3{color:#f85149;border-color:#da3633}
+  .qtext{font-size:1.12rem;font-weight:500;margin:12px 0 20px;line-height:1.5}
+  .opt{display:flex;gap:12px;align-items:flex-start;background:var(--panel2);border:1px solid var(--border);
+    border-radius:10px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:.12s;font-size:.98rem}
+  .opt:hover{border-color:var(--accent);background:#20293440}
+  .opt .key{flex:0 0 26px;height:26px;border-radius:6px;background:var(--panel);border:1px solid var(--border);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;color:var(--muted)}
+  .opt.correct{border-color:var(--green-l);background:rgba(46,160,67,.12)}
+  .opt.correct .key{background:var(--green);border-color:var(--green-l);color:#fff}
+  .opt.wrong{border-color:var(--red-l);background:rgba(248,81,73,.12)}
+  .opt.wrong .key{background:var(--red);border-color:var(--red-l);color:#fff}
+  .opt.disabled{cursor:default;pointer-events:none;opacity:.85}
+  .opt.dim{opacity:.5}
+  .feedback{margin-top:16px;padding:16px 18px;border-radius:10px;border:1px solid var(--border);
+    background:var(--panel2);animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .feedback.right{border-left:4px solid var(--green-l)}
+  .feedback.bad{border-left:4px solid var(--red-l)}
+  .feedback h4{margin:0 0 6px;font-size:.95rem}
+  .feedback p{margin:0 0 10px;font-size:.92rem;color:#c9d1d9}
+  .feedback a{color:var(--accent);text-decoration:none;font-size:.88rem;font-weight:600}
+  .feedback a:hover{text-decoration:underline}
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+  /* report */
+  .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:6px 0 24px}
+  .kpi{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+  .kpi .n{font-size:1.7rem;font-weight:700;letter-spacing:-.02em}
+  .kpi .l{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+  .verdict{font-size:1.15rem;font-weight:700;padding:14px 18px;border-radius:10px;margin-bottom:22px;text-align:center}
+  .verdict.pass{background:rgba(46,160,67,.14);border:1px solid var(--green-l);color:#3fb950}
+  .verdict.near{background:rgba(210,153,34,.14);border:1px solid var(--amber);color:#e3b341}
+  .verdict.fail{background:rgba(248,81,73,.14);border:1px solid var(--red-l);color:#f85149}
+  .dom{margin-bottom:14px}
+  .dom-head{display:flex;justify-content:space-between;font-size:.9rem;margin-bottom:5px}
+  .dom-head .name{font-weight:500}
+  .dom-head .score{color:var(--muted);font-variant-numeric:tabular-nums}
+  .track{height:9px;background:var(--panel2);border-radius:5px;overflow:hidden}
+  .fill{height:100%;border-radius:5px;transition:width .6s}
+  .muted{color:var(--muted)}
+  .small{font-size:.82rem}
+  .disc{font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);margin-top:26px;padding-top:16px}
+  ul.compact{margin:8px 0;padding-left:20px}
+  ul.compact li{margin-bottom:5px;font-size:.9rem}
+  .hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ START SCREEN ============ -->
+  <div id="start">
+    <h1>CISSP Adaptive Practice Exam</h1>
+    <p class="sub">Computerized Adaptive Testing (CAT) engine · immediate feedback · 8-domain competency report</p>
+
+    <div class="card">
+      <div class="field">
+        <label>Exam length (max questions)</label>
+        <select id="cfgLen">
+          <option value="15">Quick — 15 questions</option>
+          <option value="25" selected>Standard — 25 questions</option>
+          <option value="40">Full — 40 questions</option>
+          <option value="0">Whole bank (no adaptive stop)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Domain focus</label>
+        <select id="cfgDomain">
+          <option value="all" selected>All 8 domains (weighted like the real exam)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Adaptive early-stop</label>
+        <select id="cfgStop">
+          <option value="1" selected>On — stop when ability is confidently estimated</option>
+          <option value="0">Off — always run full length</option>
+        </select>
+      </div>
+      <div class="row" style="margin-top:20px">
+        <button class="btn" onclick="Exam.start()">Start exam</button>
+        <span class="small muted" id="bankInfo"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4 style="margin:0 0 8px">How the CAT engine works</h4>
+      <ul class="compact muted">
+        <li>Every question is tagged with a difficulty (easy / medium / hard) and a domain.</li>
+        <li>Your ability estimate (θ) updates after each answer using a logistic (Rasch/IRT-style) model.</li>
+        <li>The next question is drawn near your current ability — miss one, it eases off; nail it, it pushes harder.</li>
+        <li>When the estimate's standard error gets small enough, the exam can stop early — just like the real CISSP CAT (100–150 items).</li>
+      </ul>
+    </div>
+
+    <p class="disc">⚠️ These are <strong>original practice questions</strong> written in CISSP style across the official (ISC)² CBK domains. They are <strong>not</strong> real, leaked, or copyrighted exam items — the actual exam pool is confidential. Use this to drill concepts, not to memorize answers.</p>
+  </div>
+
+  <!-- ============ EXAM SCREEN ============ -->
+  <div id="exam" class="hide">
+    <div class="topbar">
+      <span id="qcount">Question 1</span>
+      <span id="thetaReadout"></span>
+    </div>
+    <div class="pbar"><div class="pfill" id="pfill" style="width:0%"></div></div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between">
+        <span class="badge" id="qDomain">Domain</span>
+        <span class="badge" id="qDiff">Difficulty</span>
+      </div>
+      <div class="qtext" id="qText"></div>
+      <div id="qOpts"></div>
+      <div id="qFeedback"></div>
+      <div class="foot">
+        <span class="small muted" id="runScore"></span>
+        <button class="btn hide" id="nextBtn" onclick="Exam.next()">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ REPORT SCREEN ============ -->
+  <div id="report" class="hide">
+    <h1>Exam Report</h1>
+    <p class="sub" id="repSub"></p>
+    <div id="verdict"></div>
+    <div class="kpis">
+      <div class="kpi"><div class="n" id="kScore">–</div><div class="l">Raw score</div></div>
+      <div class="kpi"><div class="n" id="kTheta">–</div><div class="l">Ability (θ)</div></div>
+      <div class="kpi"><div class="n" id="kItems">–</div><div class="l">Items taken</div></div>
+    </div>
+
+    <div class="card">
+      <h4 style="margin:0 0 16px">Domain competency</h4>
+      <div id="domBars"></div>
+    </div>
+
+    <div class="card" id="weakCard">
+      <h4 style="margin:0 0 8px">Where to focus next</h4>
+      <div id="weakList"></div>
+    </div>
+
+    <div class="row">
+      <button class="btn" onclick="Exam.restart()">Retake exam</button>
+      <button class="btn secondary" onclick="Exam.review()">Review answers</button>
+    </div>
+
+    <div id="reviewBlock" class="hide" style="margin-top:22px"></div>
+  </div>
+
+</div>
+
+<script>
+/* ===================================================================
+   CISSP ADAPTIVE PRACTICE EXAM
+   - Original CISSP-style questions across the 8 (ISC)² CBK domains
+   - IRT/Rasch-style ability estimation + adaptive item selection
+   =================================================================== */
+
+const DOMAINS = {
+  D1:"1 · Security & Risk Management",
+  D2:"2 · Asset Security",
+  D3:"3 · Security Architecture & Engineering",
+  D4:"4 · Communication & Network Security",
+  D5:"5 · Identity & Access Management",
+  D6:"6 · Security Assessment & Testing",
+  D7:"7 · Security Operations",
+  D8:"8 · Software Development Security"
+};
+// Approximate real-exam domain weighting (2024 CBK)
+const WEIGHT = {D1:.16,D2:.10,D3:.13,D4:.13,D5:.13,D6:.12,D7:.13,D8:.11};
+
+// difficulty -> IRT b parameter
+const B = {easy:-1.0, medium:0.0, hard:1.3};
+
+/* ---------- QUESTION BANK ----------
+   c = index of correct option (0-based)
+   d = difficulty, why = explanation, link = deeper dive */
+const BANK = [
+/* ---- D1 Security & Risk Management ---- */
+{dom:"D1",d:"easy",q:"Which element of the CIA triad is most directly protected by a cryptographic hash used for integrity checking?",
+ o:["Confidentiality","Integrity","Availability","Authentication"],c:1,
+ why:"A hash lets you detect unauthorized modification of data — that is the Integrity leg of the CIA triad. Encryption protects confidentiality; redundancy protects availability.",
+ link:"https://csrc.nist.gov/glossary/term/integrity"},
+{dom:"D1",d:"medium",q:"An organization accepts a risk because the cost of mitigation exceeds the potential loss. This is an example of:",
+ o:["Risk avoidance","Risk transference","Risk acceptance","Risk mitigation"],c:2,
+ why:"Choosing to live with a risk rather than spend to reduce it is risk acceptance. Transference would be buying insurance; avoidance means not doing the activity at all.",
+ link:"https://csrc.nist.gov/glossary/term/risk_acceptance"},
+{dom:"D1",d:"medium",q:"In quantitative risk analysis, the Single Loss Expectancy (SLE) is calculated as:",
+ o:["ARO × Exposure Factor","Asset Value × Exposure Factor","Asset Value × ARO","Threat × Vulnerability"],c:1,
+ why:"SLE = Asset Value × Exposure Factor. Multiply SLE by the Annualized Rate of Occurrence (ARO) to get the Annualized Loss Expectancy (ALE).",
+ link:"https://en.wikipedia.org/wiki/Risk_management#Quantitative_risk_analysis"},
+{dom:"D1",d:"hard",q:"A multinational firm must reconcile GDPR data-subject rights with a US litigation hold demanding data preservation. What governance concept best frames resolving this tension?",
+ o:["Due diligence","Conflicting legal jurisdictions / data sovereignty","Separation of duties","Defense in depth"],c:1,
+ why:"When laws of different jurisdictions impose conflicting obligations on the same data, the governing issue is data sovereignty / conflicting jurisdictional requirements — typically resolved through legal counsel, cross-border agreements, and documented risk decisions.",
+ link:"https://gdpr.eu/what-is-gdpr/"},
+{dom:"D1",d:"easy",q:"The primary purpose of a security awareness program is to:",
+ o:["Replace technical controls","Change user behavior and build a security culture","Satisfy auditors only","Document network topology"],c:1,
+ why:"Awareness/training is an administrative control aimed at changing behavior so people become part of the defense rather than the weakest link.",
+ link:"https://csrc.nist.gov/pubs/sp/800/50/final"},
+{dom:"D1",d:"hard",q:"Under the (ISC)² Code of Ethics canons, if two canons appear to conflict, they are to be applied:",
+ o:["In alphabetical order","In the order they are presented (by precedence)","Based on the CISO's discretion","Randomly"],c:1,
+ why:"The four canons are applied in the order presented; earlier canons take precedence — 'Protect society…' comes before 'Act honorably…', etc.",
+ link:"https://www.isc2.org/ethics"},
+
+/* ---- D2 Asset Security ---- */
+{dom:"D2",d:"easy",q:"Who is ultimately accountable for classifying a data asset and defining its protection requirements?",
+ o:["Data custodian","Data owner","End user","System administrator"],c:1,
+ why:"The data owner (a senior business role) is accountable for classification and protection decisions. Custodians implement and maintain the controls day-to-day.",
+ link:"https://csrc.nist.gov/glossary/term/information_owner"},
+{dom:"D2",d:"medium",q:"Data that must be protected while stored on disk is described as data:",
+ o:["In transit","In use","At rest","In motion"],c:2,
+ why:"Data at rest is stored (disk, tape, DB). In transit/in motion is moving across a network; in use is loaded in memory/being processed.",
+ link:"https://en.wikipedia.org/wiki/Data_at_rest"},
+{dom:"D2",d:"medium",q:"A data retention policy primarily helps an organization to:",
+ o:["Increase storage sales","Keep data only as long as needed for business/legal reasons","Encrypt all backups","Eliminate the need for classification"],c:1,
+ why:"Retention policies define how long data is kept and when it is destroyed — minimizing liability, cost, and exposure while meeting legal/regulatory needs.",
+ link:"https://csrc.nist.gov/glossary/term/records_retention"},
+{dom:"D2",d:"hard",q:"To render data on a solid-state drive (SSD) unrecoverable before disposal, the MOST reliable method is:",
+ o:["Single-pass overwrite","Degaussing","Cryptographic erase or physical destruction","Deleting the partition table"],c:2,
+ why:"SSD wear-leveling means overwrites and degaussing (which only works on magnetic media) are unreliable. Cryptographic erase (destroying the key) or physical destruction is the sound approach per NIST 800-88.",
+ link:"https://csrc.nist.gov/pubs/sp/800/88/r1/final"},
+{dom:"D2",d:"medium",q:"Applying protections based on the sensitivity level assigned to information is known as:",
+ o:["Data tokenization","Data classification-driven handling","Data masking","Data deduplication"],c:1,
+ why:"Classification assigns sensitivity labels (e.g., Public, Internal, Confidential) that then drive proportionate handling, access, and protection requirements.",
+ link:"https://csrc.nist.gov/glossary/term/security_categorization"},
+
+/* ---- D3 Security Architecture & Engineering ---- */
+{dom:"D3",d:"medium",q:"In the Bell-LaPadula model, the *-property (star property) enforces:",
+ o:["No read up","No write down","No read down","No write up"],c:1,
+ why:"Bell-LaPadula protects confidentiality: the Simple Security Property is 'no read up'; the *-property is 'no write down' (a subject cannot write to a lower level).",
+ link:"https://en.wikipedia.org/wiki/Bell%E2%80%93LaPadula_model"},
+{dom:"D3",d:"medium",q:"The Biba integrity model's Simple Integrity Property states a subject may:",
+ o:["Not read data at a lower integrity level","Not read data at a higher integrity level","Not write to a higher integrity level","Read anything"],c:0,
+ why:"Biba protects integrity: 'no read down' (Simple Integrity) and 'no write up' (* Integrity). It's effectively the inverse of Bell-LaPadula.",
+ link:"https://en.wikipedia.org/wiki/Biba_Model"},
+{dom:"D3",d:"easy",q:"Which cryptographic property means the same plaintext and key always yield the same ciphertext, making patterns visible?",
+ o:["Diffusion","ECB mode weakness","Perfect forward secrecy","Salting"],c:1,
+ why:"ECB (Electronic Codebook) encrypts identical blocks identically, leaking structure (the classic 'ECB penguin'). Use CBC/GCM/CTR modes instead.",
+ link:"https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation#Electronic_codebook_(ECB)"},
+{dom:"D3",d:"hard",q:"A hardware Root of Trust that stores keys and performs measured boot attestation is typically implemented as a:",
+ o:["HSM appliance in the DMZ","Trusted Platform Module (TPM)","Software key vault","RADIUS server"],c:1,
+ why:"A TPM is the on-board hardware root of trust providing sealed key storage and platform integrity measurements (measured/attested boot). An HSM secures keys but isn't the per-platform boot root of trust.",
+ link:"https://csrc.nist.gov/glossary/term/trusted_platform_module"},
+{dom:"D3",d:"medium",q:"Asymmetric encryption is generally used to exchange a symmetric session key because:",
+ o:["Symmetric keys can't be reused","Asymmetric is faster for bulk data","Asymmetric solves key distribution; symmetric is faster for bulk data","Symmetric can't be encrypted"],c:2,
+ why:"Public-key crypto elegantly solves key distribution but is slow; so it's used to exchange a fast symmetric key that then encrypts the bulk traffic — the hybrid model (e.g., TLS).",
+ link:"https://en.wikipedia.org/wiki/Hybrid_cryptosystem"},
+{dom:"D3",d:"hard",q:"A covert timing channel exfiltrates data by:",
+ o:["Encrypting the payload with AES","Modulating the timing of legitimate events to encode information","Exploiting a buffer overflow","Using a stolen TLS certificate"],c:1,
+ why:"A covert timing channel signals information by varying the timing/ordering of otherwise legitimate operations, evading normal access controls. A storage channel uses a shared storage attribute instead.",
+ link:"https://csrc.nist.gov/glossary/term/covert_timing_channel"},
+
+/* ---- D4 Communication & Network Security ---- */
+{dom:"D4",d:"easy",q:"At which OSI layer does IPsec primarily operate?",
+ o:["Layer 2 – Data Link","Layer 3 – Network","Layer 4 – Transport","Layer 7 – Application"],c:1,
+ why:"IPsec secures traffic at Layer 3 (Network), protecting IP packets. TLS operates around Layer 4–5; L2TP/PPTP at Layer 2.",
+ link:"https://en.wikipedia.org/wiki/IPsec"},
+{dom:"D4",d:"medium",q:"An attacker sends gratuitous ARP replies to associate their MAC with the default gateway's IP. This is:",
+ o:["DNS poisoning","ARP cache poisoning (spoofing)","SYN flood","Smurf attack"],c:1,
+ why:"ARP spoofing/poisoning forges ARP replies so victims send traffic to the attacker — a classic on-path (MITM) technique on a local segment.",
+ link:"https://en.wikipedia.org/wiki/ARP_spoofing"},
+{dom:"D4",d:"medium",q:"Which record type must be configured for a receiving mail server to verify a message was signed by the sending domain?",
+ o:["SPF","DKIM","MX","PTR"],c:1,
+ why:"DKIM publishes a public key in DNS and signs outbound mail; the receiver verifies the signature. SPF authorizes sending IPs; DMARC ties SPF/DKIM to policy.",
+ link:"https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail"},
+{dom:"D4",d:"hard",q:"In a network using 802.1X, the device that relays credentials between the supplicant and the authentication server is the:",
+ o:["Supplicant","Authenticator","Authentication server","Certificate authority"],c:1,
+ why:"802.1X has three roles: supplicant (client), authenticator (the switch/AP that relays EAP), and authentication server (usually RADIUS). The authenticator brokers the exchange.",
+ link:"https://en.wikipedia.org/wiki/IEEE_802.1X"},
+{dom:"D4",d:"easy",q:"Segmenting a network into VLANs primarily provides:",
+ o:["End-to-end encryption","Broadcast domain isolation and traffic segmentation","Automatic patching","Guaranteed availability"],c:1,
+ why:"VLANs logically separate broadcast domains, limiting lateral movement and containing traffic. They are a segmentation control, not encryption.",
+ link:"https://en.wikipedia.org/wiki/VLAN"},
+{dom:"D4",d:"hard",q:"A stateful firewall differs from a stateless packet filter because it:",
+ o:["Inspects application-layer payloads by default","Tracks connection state so it can permit return traffic of established sessions","Requires no rule base","Operates only at Layer 7"],c:1,
+ why:"A stateful firewall maintains a state table of connections, allowing legitimate return traffic without an explicit rule and blocking unsolicited packets. Deep payload inspection is a separate (NGFW/proxy) capability.",
+ link:"https://en.wikipedia.org/wiki/Stateful_firewall"},
+
+/* ---- D5 Identity & Access Management ---- */
+{dom:"D5",d:"easy",q:"Requiring a password plus a hardware token satisfies which authentication principle?",
+ o:["Single sign-on","Multifactor authentication","Federation","Least privilege"],c:1,
+ why:"Combining something you know (password) with something you have (token) is multifactor authentication — factors from different categories.",
+ link:"https://csrc.nist.gov/glossary/term/multi_factor_authentication"},
+{dom:"D5",d:"medium",q:"In access control, granting users only the permissions required to perform their job is the principle of:",
+ o:["Defense in depth","Least privilege","Separation of duties","Mandatory access control"],c:1,
+ why:"Least privilege minimizes rights to the minimum needed, limiting blast radius. Separation of duties splits a sensitive task across people to prevent fraud.",
+ link:"https://csrc.nist.gov/glossary/term/least_privilege"},
+{dom:"D5",d:"medium",q:"In an access control model where a central policy administrator assigns permissions to roles, and users inherit permissions via role membership, the model is:",
+ o:["DAC","MAC","RBAC","ABAC"],c:2,
+ why:"Role-Based Access Control (RBAC) assigns permissions to roles; users get access by holding a role. ABAC uses attributes/policies; DAC lets owners set access; MAC uses labels.",
+ link:"https://csrc.nist.gov/projects/role-based-access-control"},
+{dom:"D5",d:"hard",q:"In SAML-based federation, the party that authenticates the user and issues assertions is the:",
+ o:["Service Provider (SP)","Identity Provider (IdP)","Relying Party","Policy Enforcement Point"],c:1,
+ why:"The Identity Provider authenticates the user and issues SAML assertions; the Service Provider (relying party) consumes them to grant access. OIDC calls the SP a Relying Party.",
+ link:"https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language"},
+{dom:"D5",d:"medium",q:"Which phase of the identity lifecycle is MOST often neglected and leads to accumulated excess privileges (privilege creep)?",
+ o:["Provisioning","Authentication","Deprovisioning / access review","Registration"],c:2,
+ why:"Failing to revoke or recertify access as roles change causes privilege creep. Regular access reviews and prompt deprovisioning counter it.",
+ link:"https://csrc.nist.gov/glossary/term/deprovisioning"},
+{dom:"D5",d:"hard",q:"A Type I biometric error (False Rejection Rate) increasing while False Acceptance drops indicates the system's threshold was tuned toward:",
+ o:["Greater convenience","Greater security (stricter matching)","Lower cost","Faster enrollment"],c:1,
+ why:"Raising the matching threshold rejects more legitimate users (higher FRR/Type I) but accepts fewer impostors (lower FAR/Type II) — a security-favoring tuning. The Crossover Error Rate (CER) is where they meet.",
+ link:"https://en.wikipedia.org/wiki/Biometrics#Performance"},
+
+/* ---- D6 Security Assessment & Testing ---- */
+{dom:"D6",d:"easy",q:"A test where the assessor has no prior knowledge of the target environment is called:",
+ o:["White-box testing","Black-box testing","Gray-box testing","Regression testing"],c:1,
+ why:"Black-box = no internal knowledge (external attacker's view). White-box = full knowledge/source. Gray-box = partial knowledge.",
+ link:"https://owasp.org/www-project-web-security-testing-guide/"},
+{dom:"D6",d:"medium",q:"The key difference between a vulnerability scan and a penetration test is that a penetration test:",
+ o:["Is always automated","Actively exploits findings to demonstrate impact","Never uses tools","Only checks patch levels"],c:1,
+ why:"A vuln scan identifies potential weaknesses; a pen test attempts to exploit them to prove real-world impact and chain issues together.",
+ link:"https://csrc.nist.gov/glossary/term/penetration_testing"},
+{dom:"D6",d:"medium",q:"Reviewing source code to find security flaws without executing the program is:",
+ o:["Dynamic analysis (DAST)","Static analysis (SAST)","Fuzzing","Load testing"],c:1,
+ why:"SAST (static analysis) inspects source/binaries at rest. DAST tests a running app; fuzzing feeds malformed input to a running target.",
+ link:"https://owasp.org/www-community/Source_Code_Analysis_Tools"},
+{dom:"D6",d:"hard",q:"In audit logging, which control BEST ensures that a privileged administrator cannot delete evidence of their own actions?",
+ o:["Longer password policy","Write-once/append-only log forwarding to a separate, restricted system","Daily log rotation","Encrypting the admin's laptop"],c:1,
+ why:"Forwarding logs to a segregated, append-only (WORM) system the admin can't modify enforces integrity and non-repudiation — separation of duties applied to logging.",
+ link:"https://csrc.nist.gov/pubs/sp/800/92/final"},
+{dom:"D6",d:"medium",q:"A false positive in a security test is:",
+ o:["A real vulnerability missed by the tool","A benign finding reported as a vulnerability","A successful exploit","An unpatched system"],c:1,
+ why:"A false positive is a reported issue that isn't actually a vulnerability. A false negative is a real issue the tool missed — the more dangerous case.",
+ link:"https://en.wikipedia.org/wiki/False_positives_and_false_negatives"},
+{dom:"D6",d:"hard",q:"When designing a security test program, the MOST important reason to obtain written authorization (scope/rules of engagement) before testing is to:",
+ o:["Improve tool accuracy","Establish legal authority and prevent unauthorized-access liability","Reduce network latency","Guarantee zero false positives"],c:1,
+ why:"Without documented authorization and scope, testing activity can constitute unauthorized access — a legal/ethical violation. Rules of engagement define authority, scope, and limits.",
+ link:"https://owasp.org/www-project-web-security-testing-guide/"},
+
+/* ---- D7 Security Operations ---- */
+{dom:"D7",d:"easy",q:"The correct order of the incident response lifecycle (NIST) begins with:",
+ o:["Eradication","Preparation","Recovery","Lessons learned"],c:1,
+ why:"NIST SP 800-61: Preparation → Detection & Analysis → Containment, Eradication & Recovery → Post-Incident (Lessons Learned). Preparation comes first.",
+ link:"https://csrc.nist.gov/pubs/sp/800/61/r2/final"},
+{dom:"D7",d:"medium",q:"In disaster recovery, the maximum tolerable amount of data loss measured in time is the:",
+ o:["RTO (Recovery Time Objective)","RPO (Recovery Point Objective)","MTD (Maximum Tolerable Downtime)","MTBF"],c:1,
+ why:"RPO = how much data (in time) you can afford to lose → drives backup frequency. RTO = how quickly you must restore service. MTD bounds RTO.",
+ link:"https://en.wikipedia.org/wiki/Disaster_recovery#Recovery_Point_Objective"},
+{dom:"D7",d:"medium",q:"A backup strategy where each backup copies only data changed since the last *full* backup is:",
+ o:["Incremental","Differential","Snapshot","Synthetic full"],c:1,
+ why:"Differential backups copy everything changed since the last full backup (grow over time, faster restore: full + one differential). Incremental copies changes since the last backup of any type.",
+ link:"https://en.wikipedia.org/wiki/Differential_backup"},
+{dom:"D7",d:"hard",q:"During evidence collection, maintaining a documented chain of custody is essential primarily to ensure:",
+ o:["Faster forensic imaging","Admissibility and integrity of evidence in legal proceedings","Lower storage costs","Automatic malware removal"],c:1,
+ why:"Chain of custody documents who handled evidence, when, and how — preserving integrity so it holds up in court. Order of volatility guides *what* to collect first.",
+ link:"https://csrc.nist.gov/glossary/term/chain_of_custody"},
+{dom:"D7",d:"easy",q:"A recovery site that is fully equipped and can take over operations within minutes to hours is a:",
+ o:["Cold site","Warm site","Hot site","Reciprocal site"],c:2,
+ why:"Hot site = fully provisioned and near-real-time ready (highest cost). Warm site = partially equipped. Cold site = space/power only, longest recovery.",
+ link:"https://en.wikipedia.org/wiki/Backup_site"},
+{dom:"D7",d:"hard",q:"Which containment approach is generally preferred when an incident involves active data exfiltration by an advanced adversary?",
+ o:["Immediately power off all systems","Isolate affected segments while preserving volatile evidence and monitoring","Ignore until business hours","Rebuild everything before analysis"],c:1,
+ why:"Abruptly powering off destroys volatile evidence and tips off the adversary; the balanced approach isolates/segments to stop the bleed while preserving memory/artifacts and understanding scope before eradication.",
+ link:"https://csrc.nist.gov/pubs/sp/800/61/r2/final"},
+
+/* ---- D8 Software Development Security ---- */
+{dom:"D8",d:"easy",q:"Which vulnerability class is caused by an application trusting user input in a SQL statement without parameterization?",
+ o:["Cross-site scripting","SQL injection","Buffer overflow","Race condition"],c:1,
+ why:"SQL injection occurs when untrusted input is concatenated into a query. The fix is parameterized queries / prepared statements and input validation.",
+ link:"https://owasp.org/www-community/attacks/SQL_Injection"},
+{dom:"D8",d:"medium",q:"The BEST defense against stored cross-site scripting (XSS) is:",
+ o:["Disabling cookies","Context-aware output encoding plus input validation and CSP","Using HTTP instead of HTTPS","Longer session timeouts"],c:1,
+ why:"XSS is an output problem: encode data for the context it's rendered in (HTML/JS/attribute), validate input, and add a Content Security Policy as defense in depth.",
+ link:"https://owasp.org/www-community/attacks/xss/"},
+{dom:"D8",d:"medium",q:"Integrating security requirements and threat modeling early in the SDLC reflects the principle of:",
+ o:["Security through obscurity","Shift-left / security by design","Fail-open defaults","Perimeter-only security"],c:1,
+ why:"Shifting security left — designing it in and threat modeling early — is far cheaper and more effective than bolting it on after release.",
+ link:"https://owasp.org/www-community/Threat_Modeling"},
+{dom:"D8",d:"hard",q:"A TOCTOU (time-of-check to time-of-use) flaw is a type of:",
+ o:["Injection vulnerability","Race condition","Cryptographic weakness","Misconfiguration"],c:1,
+ why:"TOCTOU is a race condition: state changes between when a resource is checked and when it's used, letting an attacker swap the resource (e.g., a symlink) in the gap.",
+ link:"https://en.wikipedia.org/wiki/Time-of-check_to_time-of-use"},
+{dom:"D8",d:"medium",q:"Verifying the integrity and provenance of third-party libraries in your build (e.g., via SBOM and signature checks) primarily mitigates:",
+ o:["Phishing","Software supply-chain attacks","Physical theft","Tailgating"],c:1,
+ why:"SBOMs, dependency pinning, and signature verification counter supply-chain compromise (malicious/backdoored dependencies) such as the SolarWinds and dependency-confusion class of attacks.",
+ link:"https://www.cisa.gov/sbom"},
+{dom:"D8",d:"hard",q:"In secure design, a system that denies access when its access-control mechanism fails is following the principle of:",
+ o:["Fail-open","Fail-secure (fail-closed)","Least common mechanism","Complete mediation"],c:1,
+ why:"Fail-secure/fail-closed defaults to denying access on failure, preserving confidentiality/integrity. (Life-safety systems like door locks may deliberately fail-open for egress — a context tradeoff.)",
+ link:"https://en.wikipedia.org/wiki/Fail-safe#Security"}
+];
+
+/* ===================================================================
+   ADAPTIVE ENGINE (Rasch / 1-parameter IRT)
+   =================================================================== */
+const Exam = (function(){
+  let cfg, theta, seVar, asked, order, current, maxLen, adaptiveStop, log;
+
+  // logistic prob of correct given ability theta and item difficulty b
+  function P(th,b){ return 1/(1+Math.exp(-(th-b))); }
+
+  function reset(){
+    theta = 0;            // ability estimate
+    seVar = 1.0;          // variance of estimate (shrinks as we learn)
+    asked = new Set();
+    order = 0;
+    log = [];
+  }
+
+  // pick unused item whose difficulty b is closest to current theta,
+  // preferring the domain we've sampled least (to keep coverage)
+  function selectNext(){
+    const pool = BANK.map((q,i)=>({q,i})).filter(x=>!asked.has(x.i));
+    if(!pool.length) return null;
+    // domain coverage counts
+    const cov = {}; Object.keys(DOMAINS).forEach(k=>cov[k]=0);
+    log.forEach(l=>cov[l.dom]++);
+    let best=null, bestScore=Infinity;
+    for(const x of pool){
+      const b = B[x.q.d];
+      const info = Math.abs(theta - b);           // want item near ability
+      const under = cov[x.q.dom];                  // fewer sampled -> preferred
+      const score = info + under*0.35;             // blend
+      if(score<bestScore){bestScore=score; best=x;}
+    }
+    return best;
+  }
+
+  function updateAbility(item, correct){
+    const b = B[item.q.d];
+    const p = P(theta,b);
+    // Newton-ish MLE step; information = p(1-p)
+    const infoI = p*(1-p) || 0.01;
+    theta += (correct - p)/(infoI+1) ;            // damped update
+    theta = Math.max(-3.5, Math.min(3.5, theta));
+    // shrink variance by Fisher information
+    seVar = 1/((1/seVar) + infoI);
+  }
+
+  function shouldStop(){
+    if(maxLen>0 && order>=maxLen) return true;
+    if(asked.size>=BANK.length) return true;
+    if(adaptiveStop && order>=Math.max(10, Math.floor((maxLen||25)*0.4))){
+      if(Math.sqrt(seVar) < 0.42) return true;    // confident enough
+    }
+    return false;
+  }
+
+  /* ---------- UI ---------- */
+  function show(id){ ["start","exam","report"].forEach(s=>document.getElementById(s).classList.toggle("hide",s!==id)); }
+
+  function start(){
+    cfg = {
+      len: parseInt(document.getElementById("cfgLen").value,10),
+      stop: document.getElementById("cfgStop").value==="1"
+    };
+    maxLen = cfg.len;                 // 0 = whole bank
+    adaptiveStop = cfg.stop && maxLen!==0;
+    reset();
+    show("exam");
+    renderNext();
+  }
+
+  function renderNext(){
+    if(shouldStop()){ return finish(); }
+    const pick = selectNext();
+    if(!pick){ return finish(); }
+    current = pick;
+    asked.add(pick.i);
+    order++;
+
+    const q = pick.q;
+    document.getElementById("qcount").textContent = "Question "+order+(maxLen?(" of up to "+maxLen):"");
+    document.getElementById("thetaReadout").textContent = "θ "+theta.toFixed(2)+"  ·  SE "+Math.sqrt(seVar).toFixed(2);
+    const denom = maxLen || BANK.length;
+    document.getElementById("pfill").style.width = Math.min(100,(order/denom*100))+"%";
+
+    document.getElementById("qDomain").textContent = DOMAINS[q.dom];
+    const diffEl = document.getElementById("qDiff");
+    diffEl.textContent = q.d.charAt(0).toUpperCase()+q.d.slice(1);
+    diffEl.className = "badge "+(q.d==="easy"?"d1":q.d==="medium"?"d2":"d3");
+
+    document.getElementById("qText").textContent = q.q;
+    document.getElementById("qFeedback").innerHTML="";
+    document.getElementById("nextBtn").classList.add("hide");
+
+    const scored = log.filter(l=>l.correct).length;
+    document.getElementById("runScore").textContent = order>1 ? (scored+"/"+(order-1)+" correct so far") : "";
+
+    const optsEl = document.getElementById("qOpts");
+    optsEl.innerHTML="";
+    q.o.forEach((text,idx)=>{
+      const div = document.createElement("div");
+      div.className="opt";
+      div.innerHTML = '<div class="key">'+String.fromCharCode(65+idx)+'</div><div>'+text+'</div>';
+      div.onclick = ()=>answer(idx,div);
+      optsEl.appendChild(div);
+    });
+  }
+
+  function answer(idx, el){
+    const q = current.q;
+    const correct = idx===q.c;
+    // lock all options
+    const nodes = document.querySelectorAll("#qOpts .opt");
+    nodes.forEach((n,i)=>{
+      n.classList.add("disabled");
+      if(i===q.c) n.classList.add("correct");
+      else if(i===idx) n.classList.add("wrong");
+      else n.classList.add("dim");
+    });
+
+    updateAbility(current, correct?1:0);
+    log.push({dom:q.dom, d:q.d, correct, qi:current.i, chosen:idx});
+
+    // feedback (wrong shown immediately + explanation + deep dive; also confirm right)
+    const fb = document.getElementById("qFeedback");
+    fb.innerHTML =
+      '<div class="feedback '+(correct?"right":"bad")+'">'+
+        '<h4>'+(correct?"✓ Correct":"✗ Incorrect — correct answer: "+String.fromCharCode(65+q.c)+") "+escapeHtml(q.o[q.c]))+'</h4>'+
+        '<p>'+escapeHtml(q.why)+'</p>'+
+        '<a href="'+q.link+'" target="_blank" rel="noopener">Deeper dive ↗</a>'+
+      '</div>';
+    document.getElementById("nextBtn").classList.remove("hide");
+    document.getElementById("thetaReadout").textContent = "θ "+theta.toFixed(2)+"  ·  SE "+Math.sqrt(seVar).toFixed(2);
+  }
+
+  function next(){ renderNext(); }
+
+  /* ---------- REPORT ---------- */
+  function finish(){
+    show("report");
+    const total = log.length;
+    const right = log.filter(l=>l.correct).length;
+    const pct = total? Math.round(right/total*100):0;
+
+    document.getElementById("repSub").textContent =
+      "Adaptive session complete · final ability θ = "+theta.toFixed(2)+" (SE "+Math.sqrt(seVar).toFixed(2)+")";
+    document.getElementById("kScore").textContent = right+"/"+total+" ("+pct+"%)";
+    document.getElementById("kTheta").textContent = theta.toFixed(2);
+    document.getElementById("kItems").textContent = total;
+
+    // Verdict — CISSP CAT reports pass/fail on a scaled proficiency, not %.
+    // Map ability to a proxy: pass ≈ consistently at/above the medium difficulty standard.
+    const v = document.getElementById("verdict");
+    let cls,msg;
+    if(theta>=0.55){cls="pass"; msg="LIKELY PASS — ability is above the competency standard across sampled domains.";}
+    else if(theta>=-0.2){cls="near"; msg="BORDERLINE — near the passing standard. Tighten the weak domains below.";}
+    else {cls="fail"; msg="NOT YET — ability is below the competency standard. Focus study needed.";}
+    v.className="verdict "+cls; v.textContent=v.textContent; v.innerText=msg;
+
+    // per-domain competency (weighted by difficulty)
+    const dom = {}; Object.keys(DOMAINS).forEach(k=>dom[k]={num:0,den:0,n:0});
+    log.forEach(l=>{
+      const w = l.d==="hard"?1.5:l.d==="medium"?1.0:0.7;
+      dom[l.dom].den += w;
+      dom[l.dom].num += l.correct? w:0;
+      dom[l.dom].n++;
+    });
+
+    const bars = document.getElementById("domBars");
+    bars.innerHTML="";
+    const weak=[];
+    Object.keys(DOMAINS).forEach(k=>{
+      const d=dom[k];
+      const score = d.n? Math.round(d.num/d.den*100) : null;
+      if(d.n && score<70) weak.push({k,score});
+      const color = score===null?"#484f58": score>=80?"#2ea043": score>=60?"#d29922":"#f85149";
+      const label = score===null? "not tested" : score+"%  ("+d.n+" q)";
+      bars.innerHTML +=
+        '<div class="dom">'+
+          '<div class="dom-head"><span class="name">'+DOMAINS[k]+'</span>'+
+          '<span class="score">'+label+'</span></div>'+
+          '<div class="track"><div class="fill" style="width:'+(score===null?0:score)+'%;background:'+color+'"></div></div>'+
+        '</div>';
+    });
+
+    const wl = document.getElementById("weakList");
+    if(weak.length){
+      weak.sort((a,b)=>a.score-b.score);
+      wl.innerHTML = '<ul class="compact">'+weak.map(w=>
+        '<li><strong>'+DOMAINS[w.k]+'</strong> — '+w.score+'%. Prioritize this domain.</li>').join("")+'</ul>';
+    } else {
+      wl.innerHTML = '<p class="muted small">No domain fell below 70% among those sampled. Broaden coverage with a longer exam to confirm.</p>';
+    }
+    document.getElementById("reviewBlock").classList.add("hide");
+    document.getElementById("reviewBlock").innerHTML="";
+  }
+
+  function review(){
+    const rb = document.getElementById("reviewBlock");
+    if(!rb.classList.contains("hide")){ rb.classList.add("hide"); return; }
+    rb.classList.remove("hide");
+    rb.innerHTML = '<div class="card"><h4 style="margin:0 0 12px">Answer review</h4>'+
+      log.map((l,n)=>{
+        const q=BANK[l.qi];
+        return '<div style="border-top:1px solid var(--border);padding:12px 0">'+
+          '<div class="small muted">'+(n+1)+' · '+DOMAINS[l.dom]+' · '+l.d+'</div>'+
+          '<div style="font-weight:500;margin:4px 0">'+escapeHtml(q.q)+'</div>'+
+          '<div class="small '+(l.correct?'':'')+'">'+
+            (l.correct?'<span style="color:#3fb950">✓ You answered correctly</span>'
+             :'<span style="color:#f85149">✗ You chose '+String.fromCharCode(65+l.chosen)+') '+escapeHtml(q.o[l.chosen])+'</span> — correct: '+String.fromCharCode(65+q.c)+') '+escapeHtml(q.o[q.c]))+
+          '</div>'+
+          '<div class="small muted" style="margin-top:4px">'+escapeHtml(q.why)+' <a href="'+q.link+'" target="_blank" rel="noopener" style="color:var(--accent)">↗</a></div>'+
+        '</div>';
+      }).join("")+'</div>';
+  }
+
+  function restart(){ show("start"); }
+
+  function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+
+  return {start,next,restart,review};
+})();
+
+// bank info
+document.getElementById("bankInfo").textContent =
+  BANK.length+" questions loaded across 8 domains";
+</script>
+</body>
+</html>

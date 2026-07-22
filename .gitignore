@@ -5,3 +5,6 @@ tools/.progress.json
 .env
 tools/.env
 *.env
+tools/.verify-progress.json
+tools/verify-report.json
+tools/nemotron-batches/

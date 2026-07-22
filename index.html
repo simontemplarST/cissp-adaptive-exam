@@ -113,21 +113,8 @@
       </div>
       <div class="row" style="margin-top:20px">
         <button class="btn" id="startBtn" onclick="Exam.start()">Start exam</button>
-        <span class="small muted" id="bankInfo">Loading question bank…</span>
       </div>
     </div>
-
-    <div class="card">
-      <h4 style="margin:0 0 8px">How the CAT engine works</h4>
-      <ul class="compact muted">
-        <li>Every item is tagged with a difficulty and one of the 8 (ISC)² domains.</li>
-        <li>Your ability estimate (θ) updates after each answer using a logistic (Rasch/IRT) model.</li>
-        <li>The next item is drawn near your current ability and weighted toward the real exam's domain mix — miss one, it eases off; nail it, it pushes harder.</li>
-        <li>When the estimate's standard error is small enough, the exam can stop early — like the real CISSP CAT (100–150 items).</li>
-      </ul>
-    </div>
-
-    <p class="disc">⚠️ These are <strong>original, generated practice questions</strong> built from verified fact tables across the (ISC)² CBK domains — <strong>not</strong> real, leaked, or copyrighted exam items (the actual pool is confidential, and using leaked pools can void a certification). Concepts are drawn from public references (NIST, OWASP, ISC², Wikipedia). Use this to drill understanding, not to memorize answers.</p>
   </div>
 
   <!-- EXAM -->
@@ -169,6 +156,11 @@
     <div id="reviewBlock" class="hide" style="margin-top:22px"></div>
   </div>
 
+  <footer class="disc">
+    This site was vibecoded. None of the questions here were taken directly from any official testing or training source. If you believe any content mistakenly uses your intellectual property, email
+    <a class="plain" href="mailto:webmaster@cameronheard.com">webmaster@cameronheard.com</a>.
+  </footer>
+
 </div>
 
 <script src="assets/curated.js"></script>
@@ -192,12 +184,6 @@ try {
   // curated core, then hand-authored (Claude, no API), then AI-verified (OpenRouter), then procedural filler
   BANK = curated.concat(claudeAuthored, llm, generated);
 } catch(e){ BANK = curated.concat(claudeAuthored, llm); console.error(e); }
-
-const distinctStems = new Set(BANK.map(q=>q.q)).size;
-document.getElementById("bankInfo").textContent =
-  BANK.length.toLocaleString()+" questions · "+distinctStems.toLocaleString()+" distinct · 8 domains" +
-  (claudeAuthored.length ? " · "+claudeAuthored.length.toLocaleString()+" hand-authored" : "") +
-  (llm.length ? " · "+llm.length.toLocaleString()+" AI-verified" : "");
 
 /* ================= adaptive engine ================= */
 const Exam = (function(){

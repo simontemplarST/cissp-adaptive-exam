@@ -63,8 +63,8 @@ const LINKS = {
   D8: "https://owasp.org/www-project-top-ten/"
 };
 
-const OUT_FILE = path.join(ROOT, "assets", "llm-bank.js");
-const PROGRESS = path.join(__dirname, ".progress.json");
+const OUT_FILE = process.env.OUT_FILE ? path.resolve(ROOT, process.env.OUT_FILE) : path.join(ROOT, "assets", "llm-bank.js");
+const PROGRESS = process.env.PROGRESS_FILE ? path.resolve(ROOT, process.env.PROGRESS_FILE) : path.join(__dirname, ".progress.json");
 
 /* ---------------- OpenRouter call ---------------- */
 async function chat(model, messages, { json = true, retries = 4 } = {}) {

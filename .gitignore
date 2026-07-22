@@ -8,3 +8,4 @@ tools/.env
 tools/.verify-progress.json
 tools/verify-report.json
 tools/nemotron-batches/
+tools/.batch-staging.js
